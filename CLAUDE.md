@@ -7,22 +7,20 @@ Metrics: count of valid records, average price, longest warranty,
 total stock (sum of `stock`, type long).
 
 ## Language
-
 - Code, javadoc, docs, commits, issues, PRs, logs: English.
 - Program report and skipped-line messages: Ukrainian, money in "грн".
-- Lab reports (`docs/REPORT-lab1.md`, later `docs/REPORT-lab2.md`) are written in Ukrainian; do not edit them unless asked.
+- Lab reports (`docs/REPORT-lab1.md`, `docs/REPORT-lab2.md`) are written in Ukrainian; do not edit them unless asked.
 
 ## Build
-
 - Maven only through the Wrapper: `./mvnw -B clean verify` (Git Bash/Unix), `.\mvnw.cmd -B clean verify` (cmd).
 - JUnit 5 (test scope), SpotBugs bound to `verify`, Maven Shade for the executable JAR.
 - No runtime dependencies. Package `ua.lpnu.kzp`, entry point `Main`.
 - Lifecycle order: compile, test, package, verify.
 
 ## Hard rules
-
-- Reading, validation, calculation and formatting are separate methods or utility classes.
-  The data model is defined in "Lab 2 rules" below (Lab 1 used `String[]` and primitives).
+- No entity classes (that is lab 2): records are String[] and primitives. Reading, validation,
+  calculation and formatting are separate methods or utility classes. Lab 1 rule; Lab 2 allows
+  entity classes, see "Lab 2 rules" below.
 - Use `Path`, explicit UTF-8, `Locale.ROOT`, `%n`. No hard-coded path separators.
 - Validation: trim fields; name and category not blank; numbers must match `-?\d+(\.\d+)?`
   (no exponent, no f/d suffix, no NaN/Infinity); price > 0; warrantyMonths >= 0; stock >= 0;
@@ -40,7 +38,6 @@ total stock (sum of `stock`, type long).
 - Docs: concise and factual, no emoji, no filler.
 
 ## Workflow
-
 - Tasks live in GitHub Issues. Before starting, read the Issue with `gh issue view <N>` and follow its acceptance criteria.
 - One PR covers a small group of related Issues; branch `<type>/<N>-<M>-<slug>`, one logical change per commit. Stay within the scope of the listed Issues.
 - Write tests from the Issue acceptance criteria first, then the implementation.

@@ -10,22 +10,22 @@ JDK 21. No Maven installation is needed: the build uses the Maven Wrapper (`mvnw
 
 ## Build and run
 
-| Shell                     | Build                        | Run                                |
-| ------------------------- | ---------------------------- | ---------------------------------- |
+| Shell | Build | Run |
+|---|---|---|
 | Windows (cmd, PowerShell) | `.\mvnw.cmd -B clean verify` | `java -jar target/lab01-1.0.0.jar` |
-| Unix, Git Bash            | `./mvnw -B clean verify`     | `java -jar target/lab01-1.0.0.jar` |
+| Unix, Git Bash | `./mvnw -B clean verify` | `java -jar target/lab01-1.0.0.jar` |
 
 Console output is always UTF-8; legacy `cmd.exe` needs `chcp 65001` to display it correctly.
 
 ## CLI options
 
-| Option            | Meaning                                 | Default          |
-| ----------------- | --------------------------------------- | ---------------- |
-| `--help`          | Print usage and exit                    | -                |
-| `--version`       | Print version and build number and exit | -                |
-| `--input <path>`  | Input CSV file                          | `data/input.csv` |
-| `--output <path>` | Report file                             | `out/report.txt` |
-| `--verbose`       | Mirror log records to stderr            | off              |
+| Option | Meaning | Default |
+|---|---|---|
+| `--help` | Print usage and exit | - |
+| `--version` | Print version and build number and exit | - |
+| `--input <path>` | Input CSV file | `data/input.csv` |
+| `--output <path>` | Report file | `out/report.txt` |
+| `--verbose` | Mirror log records to stderr | off |
 
 `--help` takes precedence over every other argument, `--version` over any argument error;
 neither creates files.
@@ -35,13 +35,13 @@ neither creates files.
 UTF-8, separator `;`, no header line, one record per line. LF and CRLF line endings and a
 leading BOM are accepted. Every field is trimmed before validation.
 
-| Field            | Type   | Rule                                   |
-| ---------------- | ------ | -------------------------------------- |
-| `name`           | String | not blank                              |
-| `category`       | String | not blank                              |
-| `price`          | double | plain decimal, finite, greater than 0  |
-| `warrantyMonths` | int    | integer, 0 or more, at most 2147483647 |
-| `stock`          | int    | integer, 0 or more, at most 2147483647 |
+| Field | Type | Rule |
+|---|---|---|
+| `name` | String | not blank |
+| `category` | String | not blank |
+| `price` | double | plain decimal, finite, greater than 0 |
+| `warrantyMonths` | int | integer, 0 or more, at most 2147483647 |
+| `stock` | int | integer, 0 or more, at most 2147483647 |
 
 Numbers must match `-?\d+(\.\d+)?`: no exponent, no `+` sign, no `f`/`d` suffix, no `NaN` or
 `Infinity`, no thousands or comma separators.
@@ -55,21 +55,21 @@ Numbers must match `-?\d+(\.\d+)?`: no exponent, no `+` sign, no `f`/`d` suffix,
 Checks run in this order and the first failing check wins. Every skipped line appears in the
 report with its line number and reason, and processing continues.
 
-| Check                            | Example message                                                    |
-| -------------------------------- | ------------------------------------------------------------------ |
-| Empty or blank line              | `Рядок 1: порожній рядок`                                          |
-| Exactly 5 fields                 | `Рядок 2: очікується 5 полів, отримано 4`                          |
-| Name not blank                   | `Рядок 3: назва: порожнє поле`                                     |
-| Category not blank               | `Рядок 4: категорія: порожнє поле`                                 |
-| Price, warranty, stock present   | `Рядок 5: ціна: порожнє поле`                                      |
-| Price is a plain decimal         | `Рядок 6: ціна: не є числом: "1e3"`                                |
-| Price fits into double           | `Рядок 9: ціна: завелике значення: "111…"` (400 digits, shortened) |
-| Price not negative               | `Рядок 8: ціна: від'ємне значення: "-5"`                           |
-| Price greater than 0 (`0`, `-0`) | `Рядок 7: ціна: має бути більше нуля: "0"`                         |
-| Warranty/stock is a number       | `Рядок 11: гарантія: не є числом: "+5"`                            |
-| Warranty/stock has no fraction   | `Рядок 10: гарантія: має бути цілим числом: "12.5"`                |
-| Warranty/stock not negative      | `Рядок 12: запас: від'ємне значення: "-3"`                         |
-| Warranty/stock fits into int     | `Рядок 13: запас: завелике значення: "2147483648"`                 |
+| Check | Example message |
+|---|---|
+| Empty or blank line | `Рядок 1: порожній рядок` |
+| Exactly 5 fields | `Рядок 2: очікується 5 полів, отримано 4` |
+| Name not blank | `Рядок 3: назва: порожнє поле` |
+| Category not blank | `Рядок 4: категорія: порожнє поле` |
+| Price, warranty, stock present | `Рядок 5: ціна: порожнє поле` |
+| Price is a plain decimal | `Рядок 6: ціна: не є числом: "1e3"` |
+| Price fits into double | `Рядок 9: ціна: завелике значення: "111…"` (400 digits, shortened) |
+| Price not negative | `Рядок 8: ціна: від'ємне значення: "-5"` |
+| Price greater than 0 (`0`, `-0`) | `Рядок 7: ціна: має бути більше нуля: "0"` |
+| Warranty/stock is a number | `Рядок 11: гарантія: не є числом: "+5"` |
+| Warranty/stock has no fraction | `Рядок 10: гарантія: має бути цілим числом: "12.5"` |
+| Warranty/stock not negative | `Рядок 12: запас: від'ємне значення: "-3"` |
+| Warranty/stock fits into int | `Рядок 13: запас: завелике значення: "2147483648"` |
 
 Line numbers in the examples are illustrative.
 
@@ -108,11 +108,11 @@ parent directories are created. Without valid records the table is replaced by
 
 ## Exit codes
 
-| Code | Meaning                                                                      |
-| ---- | ---------------------------------------------------------------------------- |
-| 0    | Report written with at least one valid record; also `--help` and `--version` |
-| 1    | No valid records; the report is still printed and written                    |
-| 2    | Argument error, input file cannot be read, or report file cannot be written  |
+| Code | Meaning |
+|---|---|
+| 0 | Report written with at least one valid record; also `--help` and `--version` |
+| 1 | No valid records; the report is still printed and written |
+| 2 | Argument error, input file cannot be read, or report file cannot be written |
 
 ## Logging
 
@@ -132,15 +132,15 @@ printed to stderr and the run continues.
 
 `./mvnw -B clean verify` runs 214 JUnit 5 tests, many of them parameterized:
 
-| Area        | Covered                                                                                                         |
-| ----------- | --------------------------------------------------------------------------------------------------------------- |
-| CLI parsing | defaults, every option, precedence, unknown arguments, missing values                                           |
-| Reading     | LF/CRLF, BOM, blank lines, empty file, directory as input, malformed UTF-8                                      |
-| Validation  | every rule, boundaries (0, 0.01, `-0`, 400-digit price, `Integer.MAX_VALUE` and one above), whitespace and tabs |
-| Metrics     | known datasets, single record, rounding, stock sum above `Integer.MAX_VALUE`, no records                        |
-| Report      | exact text, locale independence, UTF-8 file, parent directories, unwritable path                                |
-| Logging     | line format, stack traces, verbose mirror, handler I/O failures                                                 |
-| End-to-end  | `Main.run` over fixture files in `src/test/resources/fixtures` and `data/input.csv`                             |
+| Area | Covered |
+|---|---|
+| CLI parsing | defaults, every option, precedence, unknown arguments, missing values |
+| Reading | LF/CRLF, BOM, blank lines, empty file, directory as input, malformed UTF-8 |
+| Validation | every rule, boundaries (0, 0.01, `-0`, 400-digit price, `Integer.MAX_VALUE` and one above), whitespace and tabs |
+| Metrics | known datasets, single record, rounding, stock sum above `Integer.MAX_VALUE`, no records |
+| Report | exact text, locale independence, UTF-8 file, parent directories, unwritable path |
+| Logging | line format, stack traces, verbose mirror, handler I/O failures |
+| End-to-end | `Main.run` over fixture files in `src/test/resources/fixtures` and `data/input.csv` |
 
 JaCoCo enforces a minimum covered ratio in `verify`: 95% instructions and 90% branches
 (`pom.xml`). The HTML report is in `target/site/jacoco`; CI uploads it as `jacoco-report`.
@@ -184,10 +184,10 @@ are described in [ai/](ai/); lab reports are in [docs/](docs/).
 
 ## Labs
 
-| Lab | Topic                                      | Status                                                                  |
-| --- | ------------------------------------------ | ----------------------------------------------------------------------- |
-| 1   | Deployment and data processing             | Done, tag `v1.0.0`, [docs/REPORT-lab1.md](docs/REPORT-lab1.md)          |
-| 2   | Classes, record, encapsulation             | In progress                                                             |
+| Lab | Topic                          | Status                                                         |
+|---|---|---|
+| 1   | Deployment and data processing | Done, tag `v1.0.0`, [docs/REPORT-lab1.md](docs/REPORT-lab1.md) |
+| 2   | Classes, record, encapsulation | In progress                                                    |
 
 The Lab 1 output snapshot used to check behaviour preservation is in
 [docs/baseline/lab1/](docs/baseline/lab1/).
