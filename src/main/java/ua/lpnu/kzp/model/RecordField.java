@@ -1,4 +1,4 @@
-package ua.lpnu.kzp.data;
+package ua.lpnu.kzp.model;
 
 /**
  * The five fields of a record, in the order in which they appear in the CSV line.

@@ -1,5 +1,8 @@
 package ua.lpnu.kzp.data;
 
+import ua.lpnu.kzp.model.RecordField;
+import ua.lpnu.kzp.model.ValidationError;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

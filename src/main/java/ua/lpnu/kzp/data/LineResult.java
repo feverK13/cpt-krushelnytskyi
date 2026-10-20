@@ -1,5 +1,8 @@
 package ua.lpnu.kzp.data;
 
+import ua.lpnu.kzp.model.RecordField;
+import ua.lpnu.kzp.model.ValidationError;
+
 import java.util.List;
 import java.util.Locale;
 

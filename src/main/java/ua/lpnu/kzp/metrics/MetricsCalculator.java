@@ -1,6 +1,6 @@
 package ua.lpnu.kzp.metrics;
 
-import ua.lpnu.kzp.data.RecordField;
+import ua.lpnu.kzp.model.RecordField;
 
 import java.util.List;
 import java.util.Optional;

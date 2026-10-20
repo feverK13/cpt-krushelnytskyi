@@ -1,4 +1,4 @@
-package ua.lpnu.kzp.data;
+package ua.lpnu.kzp.model;
 
 import java.util.Locale;
 
