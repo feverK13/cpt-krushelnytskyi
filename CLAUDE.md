@@ -49,3 +49,14 @@ total stock (sum of `stock`, type long).
   one logical change per commit. PR body contains `Closes #N`.
 - Show the diff and explain each change briefly. Do not push without confirmation.
 - Output style: terse. Do not recap steps already shown or restate file contents; report only command results, diffs and decisions that need my input.
+
+## Lab 2 rules
+
+- Behaviour preservation: report, metrics, error messages, their order and exit codes must
+  match the Lab 1 snapshot in `docs/baseline/lab1/`.
+- Validation rules live only in `Product` (constructor / `fromCsv`) and the records; no
+  duplicated validators.
+- Branches are `lab2/<issue-numbers>-<slug>`; one PR per group of Issues, body contains `Closes #N`.
+- Tick Issue acceptance criteria and the PR checklist at merge time, only for verified items.
+- No push without my explicit "push" message. No merging.
+- I run `./mvnw` myself with the `!` prefix when asked.
