@@ -48,7 +48,7 @@ public final class AppVersion {
     /**
      * Returns the text printed by {@code --version}.
      *
-     * @return e.g. {@code 1.0.0 (build 42)}
+     * @return e.g. {@code 1.1.0 (build 42)}
      */
     public static String describe() {
         return describe(get(), buildNumber());

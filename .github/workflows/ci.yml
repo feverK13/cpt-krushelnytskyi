@@ -52,8 +52,8 @@ jobs:
       - name: Smoke run
         shell: bash
         run: |
-          java -jar target/lab01-1.0.0.jar --version
-          java -jar target/lab01-1.0.0.jar --input data/input.csv --output "$RUNNER_TEMP/report.txt"
+          java -jar target/lab01-1.1.0.jar --version
+          java -jar target/lab01-1.1.0.jar --input data/input.csv --output "$RUNNER_TEMP/report.txt"
 
       - name: Upload JaCoCo report
         if: matrix.os == 'ubuntu-latest'
