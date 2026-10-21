@@ -12,8 +12,8 @@ JDK 21. No Maven installation is needed: the build uses the Maven Wrapper (`mvnw
 
 | Shell | Build | Run |
 |---|---|---|
-| Windows (cmd, PowerShell) | `.\mvnw.cmd -B clean verify` | `java -jar target/lab01-1.0.0.jar` |
-| Unix, Git Bash | `./mvnw -B clean verify` | `java -jar target/lab01-1.0.0.jar` |
+| Windows (cmd, PowerShell) | `.\mvnw.cmd -B clean verify` | `java -jar target/lab01-1.1.0.jar` |
+| Unix, Git Bash | `./mvnw -B clean verify` | `java -jar target/lab01-1.1.0.jar` |
 
 Console output is always UTF-8; legacy `cmd.exe` needs `chcp 65001` to display it correctly.
 
@@ -73,10 +73,37 @@ report with its line number and reason, and processing continues.
 
 Line numbers in the examples are illustrative.
 
-## Building a product in code
+The price rule is `> 0`, not `>= 0`. This is a compliant refinement of the Lab 2 minimum rule:
+Lab 1 rejected a price of 0, and allowing it would change the average price. Warranty and stock
+allow 0.
 
-`Product.builder()` collects the five fields and `build()` calls the validating constructor, so an
-invalid product cannot be created. Unset text fails with `NullPointerException`, unset numbers are 0.
+## Model
+
+The records of Lab 1 (`String[]` and primitives) are replaced by objects in `ua.lpnu.kzp.model`.
+
+`Product` is a final, immutable class. Every invariant is checked in its constructor, so an invalid
+`Product` cannot exist.
+
+| Field | Type | Invariant |
+|---|---|---|
+| `name` | String | not blank, stored trimmed |
+| `category` | String | not blank, stored trimmed |
+| `price` | double | finite, greater than 0 |
+| `warrantyMonths` | int | 0 or more |
+| `stock` | int | 0 or more |
+
+- Constructor `Product(name, category, price, warrantyMonths, stock)` checks the fields in this
+  order; the first failing check wins. A `null` name or category throws `NullPointerException`;
+  any other violation throws `ProductValidationException` (an `IllegalArgumentException`) that
+  carries the field, the reason and the offending value.
+- `Product.fromCsv(String line)` parses one line field by field: it parses a field, runs that
+  field's check, then moves on. Its exception quotes the raw field text, so the skipped-line
+  messages are the Lab 1 messages. The line number is added by `InputProcessor`, not by `Product`.
+  A price that overflows `double` is reported as "too large"; the constructor rejects non-finite
+  prices for direct callers.
+- `Product.builder()` returns a `Product.Builder` with a fluent setter per field. `build()` calls
+  the constructor, so validation cannot be bypassed and every call returns a new `Product`. Unset
+  text fails like a `null` argument, an unset price like a price of 0, unset numbers are 0.
 
 ```java
 Product product = Product.builder()
@@ -84,9 +111,23 @@ Product product = Product.builder()
         .build();
 ```
 
+`WarrantyStock(int warrantyMonths, int stock)` is a record that groups the two quantities. Its
+compact constructor rejects negative values; `Product.warrantyStock()` returns one, and
+`MetricsCalculator` reads the warranty and the stock through it.
+
+### Changes since Lab 1
+
+- `RecordSplitter`, `RecordValidator` and `LineResult` are removed (they remain at tag `v1.0.0`).
+  `InputProcessor` builds a `List<Product>` with `Product.fromCsv`; an invalid line is never added
+  to the list and never changes the metrics.
+- `MetricsCalculator` takes `List<Product>`; `ReportFormatter` is unchanged.
+- The report, the metrics, the skipped-line messages and their order, the log format and the exit
+  codes are the same as in Lab 1. `GoldenReportTest` compares the output for `data/input.csv` with
+  the Lab 1 report; the snapshot is in [docs/baseline/lab1/](docs/baseline/lab1/).
+
 ## Output
 
-Real output of `java -jar target/lab01-1.0.0.jar` for [data/input.csv](data/input.csv)
+Real output of `java -jar target/lab01-1.1.0.jar` for [data/input.csv](data/input.csv)
 (run on Windows; on Unix the path is printed as `data/input.csv`):
 
 ```text
@@ -135,23 +176,25 @@ field. ERROR records include the stack trace. If the log file cannot be created,
 printed to stderr and the run continues.
 
 ```text
-2026-10-06T22:30:27.829+03:00 | INFO | Main.run | line=- field=- | Application started, version 1.0.0
+2026-10-06T22:30:27.829+03:00 | INFO | Main.run | line=- field=- | Application started, version 1.1.0
 2026-10-06T22:30:27.857+03:00 | WARN | InputProcessor.process | line=3 field=price | Skipped line: not a number: "абв"
 ```
 
 ## Testing
 
-`./mvnw -B clean verify` runs 214 JUnit 5 tests, many of them parameterized:
+`./mvnw -B clean verify` runs 358 JUnit 5 tests, many of them parameterized:
 
 | Area | Covered |
 |---|---|
 | CLI parsing | defaults, every option, precedence, unknown arguments, missing values |
 | Reading | LF/CRLF, BOM, blank lines, empty file, directory as input, malformed UTF-8 |
-| Validation | every rule, boundaries (0, 0.01, `-0`, 400-digit price, `Integer.MAX_VALUE` and one above), whitespace and tabs |
+| Validation | `Product.fromCsv`: every rule, boundaries (0, 0.01, `-0`, 400-digit price, `Integer.MAX_VALUE` and one above), whitespace and tabs, first failing field, raw text in messages |
+| Model | `Product` constructor and invariants, immutability, `Product.Builder`, `WarrantyStock` |
 | Metrics | known datasets, single record, rounding, stock sum above `Integer.MAX_VALUE`, no records |
 | Report | exact text, locale independence, UTF-8 file, parent directories, unwritable path |
 | Logging | line format, stack traces, verbose mirror, handler I/O failures |
 | End-to-end | `Main.run` over fixture files in `src/test/resources/fixtures` and `data/input.csv` |
+| Behaviour | `GoldenReportTest`: console and report file equal the Lab 1 report, exit code 0 |
 
 JaCoCo enforces a minimum covered ratio in `verify`: 95% instructions and 90% branches
 (`pom.xml`). The HTML report is in `target/site/jacoco`; CI uploads it as `jacoco-report`.
@@ -184,9 +227,10 @@ cached. SpotBugs runs in `verify` and fails the build on findings. Each runner u
 shaded JAR as `jar-<os>-build-<N>`, where `N` is the workflow run number; `ubuntu-latest`
 also uploads `jacoco-report`. The job fails if the tests created `out/` in the project directory.
 
-The version is set in `pom.xml` (`1.0.0`) and a `v*` tag triggers CI. CI passes the run
+The version is set in `pom.xml` (`1.1.0`) and a `v*` tag triggers CI. CI passes the run
 number as `ci.build.number`; it goes into the JAR manifest (`Build-Number`) and into
-`--version`, which prints `1.0.0 (build 12)` in CI and `1.0.0 (build local)` for local builds.
+`--version`, which prints `1.1.0 (build 12)` in CI and `1.1.0 (build local)` for local builds.
+The version in `pom.xml`, in the tag `v1.1.0` and in the `--version` output is the same.
 
 ## Workflow
 
@@ -200,7 +244,7 @@ are described in [ai/](ai/); lab reports are in [docs/](docs/).
 | Lab | Topic                          | Status                                                         |
 |---|---|---|
 | 1   | Deployment and data processing | Done, tag `v1.0.0`, [docs/REPORT-lab1.md](docs/REPORT-lab1.md) |
-| 2   | Classes, record, encapsulation | In progress                                                    |
+| 2   | Classes, record, encapsulation | Done, tag `v1.1.0`, [REPORT.md](REPORT.md)                     |
 
 The Lab 1 output snapshot used to check behaviour preservation is in
 [docs/baseline/lab1/](docs/baseline/lab1/).
