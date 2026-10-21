@@ -45,4 +45,13 @@ class ProductValidationExceptionTest {
 
         assertEquals("category: empty field", e.getMessage());
     }
+
+    @Test
+    void wholeLineFailureHasNoField() {
+        ProductValidationException e =
+                new ProductValidationException(null, ValidationError.FIELD_COUNT, "4");
+
+        assertNull(e.field());
+        assertEquals("expected 5 fields, got 4", e.getMessage());
+    }
 }
