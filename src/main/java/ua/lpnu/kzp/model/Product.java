@@ -49,6 +49,15 @@ public final class Product {
     }
 
     /**
+     * Returns a new builder.
+     *
+     * @return an empty {@link Builder}
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
      * Parses one CSV line {@code name;category;price;warrantyMonths;stock}; fields are trimmed.
      *
      * <p>Numbers are plain decimals ({@code -?\d+(\.\d+)?}); warranty and stock must fit into
@@ -217,5 +226,62 @@ public final class Product {
                 price,
                 warrantyMonths,
                 stock);
+    }
+
+    /**
+     * Collects field values and creates a {@link Product} through its validating constructor, so
+     * the builder cannot produce an invalid product. Unset text is {@code null}, unset numbers
+     * are 0.
+     */
+    public static final class Builder {
+
+        private String name;
+        private String category;
+        private double price;
+        private int warrantyMonths;
+        private int stock;
+
+        private Builder() {
+        }
+
+        /** Sets the name. */
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        /** Sets the category. */
+        public Builder category(String category) {
+            this.category = category;
+            return this;
+        }
+
+        /** Sets the price in UAH. */
+        public Builder price(double price) {
+            this.price = price;
+            return this;
+        }
+
+        /** Sets the warranty length in months. */
+        public Builder warrantyMonths(int warrantyMonths) {
+            this.warrantyMonths = warrantyMonths;
+            return this;
+        }
+
+        /** Sets the number of items in stock. */
+        public Builder stock(int stock) {
+            this.stock = stock;
+            return this;
+        }
+
+        /**
+         * Creates a new product from the current values.
+         *
+         * @throws NullPointerException       if the name or the category is not set
+         * @throws ProductValidationException as the {@link Product} constructor does
+         */
+        public Product build() {
+            return new Product(name, category, price, warrantyMonths, stock);
+        }
     }
 }
