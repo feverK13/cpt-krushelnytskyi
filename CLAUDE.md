@@ -57,3 +57,10 @@ total stock (sum of `stock`, type long).
 - Tick Issue acceptance criteria and the PR checklist at merge time, only for verified items.
 - No push without my explicit "push" message. No merging.
 - I run `./mvnw` myself with the `!` prefix when asked.
+
+## Comment policy
+
+- Javadoc on public API as the lab requires; keep it concise: one sentence of purpose,
+  `@param`/`@return`/`@throws` only when not obvious, no HTML lists that mirror the code.
+- Inline comments only for non-obvious reasons (why, not what); never restate the code.
+- No `// Arrange` / `// Act` / `// Assert` markers in tests.

@@ -5,23 +5,10 @@ import java.util.Locale;
 import java.util.Objects;
 
 /**
- * An item of the electronics store: {@code name;category;price;warrantyMonths;stock}.
+ * An immutable, always valid item of the electronics store.
  *
- * <p>The object is immutable and always valid: every invariant is checked in the constructor, so
- * an invalid {@code Product} cannot exist. The rules and their order are those of Lab 1; the first
- * failing check wins:</p>
- * <ol>
- *   <li>{@code name} is not blank,</li>
- *   <li>{@code category} is not blank,</li>
- *   <li>{@code price} is finite and greater than 0,</li>
- *   <li>{@code warrantyMonths} is 0 or more,</li>
- *   <li>{@code stock} is 0 or more.</li>
- * </ol>
- *
- * <p>The price rule is {@code > 0}, not {@code >= 0}. This is a compliant refinement of the
- * Lab 2 minimum rules by the Lab 1 rules: zero is allowed only where Lab 1 allowed it, and Lab 1
- * rejected a price of 0 (allowing it would also change the average price). Warranty and stock
- * allow 0.</p>
+ * <p>Price must be {@code > 0}: this is a compliant refinement of the Lab 2 minimum rule, because
+ * Lab 1 rejected a price of 0.</p>
  */
 public final class Product {
 
@@ -32,20 +19,11 @@ public final class Product {
     private final int stock;
 
     /**
-     * Creates a product after checking every invariant.
+     * Creates a product; name and category are stripped.
      *
-     * <p>Name and category are stripped of surrounding whitespace. A non-finite price is rejected
-     * here for direct callers; the CSV parsing layer reports such values as parse errors before
-     * they reach the constructor.</p>
-     *
-     * @param name           product name, not blank
-     * @param category       product category, not blank
-     * @param price          price in UAH, finite and greater than 0
-     * @param warrantyMonths warranty length in months, 0 or more
-     * @param stock          number of items in stock, 0 or more
      * @throws NullPointerException       if {@code name} or {@code category} is {@code null}
-     * @throws ProductValidationException if an invariant is violated; the exception names the
-     *                                    first failing field in the order given above
+     * @throws ProductValidationException for the first failing field, checked in the order of the
+     *                                    parameters (the Lab 1 order)
      */
     public Product(String name, String category, double price, int warrantyMonths, int stock) {
         this.name = checkName(name);
@@ -58,26 +36,11 @@ public final class Product {
         this.stock = stock;
     }
 
-    /**
-     * Checks a product name.
-     *
-     * @param name the name, possibly padded with whitespace
-     * @return the stripped name
-     * @throws NullPointerException       if {@code name} is {@code null}
-     * @throws ProductValidationException if the stripped name is empty
-     */
+    // null is a programming error, not bad input, so it is not a ProductValidationException.
     static String checkName(String name) {
         return checkText(RecordField.NAME, Objects.requireNonNull(name, "name"));
     }
 
-    /**
-     * Checks a product category.
-     *
-     * @param category the category, possibly padded with whitespace
-     * @return the stripped category
-     * @throws NullPointerException       if {@code category} is {@code null}
-     * @throws ProductValidationException if the stripped category is empty
-     */
     static String checkCategory(String category) {
         return checkText(RecordField.CATEGORY, Objects.requireNonNull(category, "category"));
     }
@@ -90,13 +53,7 @@ public final class Product {
         return stripped;
     }
 
-    /**
-     * Checks a price: finite and strictly positive. {@code -0.0} is rejected as not positive, not
-     * as negative, like {@code -0} in Lab 1.
-     *
-     * @param price the price to check
-     * @throws ProductValidationException if the price is NaN, infinite, negative or zero
-     */
+    // -0.0 is not less than 0, so it is reported as NOT_POSITIVE, like "-0" in Lab 1.
     static void checkPrice(double price) {
         if (Double.isNaN(price)) {
             throw new ProductValidationException(
@@ -116,71 +73,41 @@ public final class Product {
         }
     }
 
-    /** Formats a finite price without exponent and independently of the default locale. */
     private static String canonical(double price) {
         return BigDecimal.valueOf(price).toPlainString();
     }
 
-    /**
-     * Returns the product name.
-     *
-     * @return the stripped, non-blank name
-     */
+    /** Returns the stripped, non-blank name. */
     public String getName() {
         return name;
     }
 
-    /**
-     * Returns the product category.
-     *
-     * @return the stripped, non-blank category
-     */
+    /** Returns the stripped, non-blank category. */
     public String getCategory() {
         return category;
     }
 
-    /**
-     * Returns the price.
-     *
-     * @return the price in UAH, finite and greater than 0
-     */
+    /** Returns the price in UAH. */
     public double getPrice() {
         return price;
     }
 
-    /**
-     * Returns the warranty length.
-     *
-     * @return warranty in months, 0 or more
-     */
+    /** Returns the warranty length in months. */
     public int getWarrantyMonths() {
         return warrantyMonths;
     }
 
-    /**
-     * Returns the stock quantity.
-     *
-     * @return number of items in stock, 0 or more
-     */
+    /** Returns the number of items in stock. */
     public int getStock() {
         return stock;
     }
 
-    /**
-     * Returns the warranty and the stock as one immutable value.
-     *
-     * @return a new {@link WarrantyStock} equal to this product's warranty and stock
-     */
+    /** Returns the warranty and the stock as one immutable value. */
     public WarrantyStock warrantyStock() {
         return new WarrantyStock(warrantyMonths, stock);
     }
 
-    /**
-     * Renders the product for diagnostics, with the price in two decimals independently of the
-     * default locale.
-     *
-     * @return e.g. {@code Product[name=Монітор, category=Монітори, price=6499.00, warrantyMonths=36, stock=12]}
-     */
+    /** Renders the product for diagnostics, with a locale-independent two-decimal price. */
     @Override
     public String toString() {
         return String.format(
