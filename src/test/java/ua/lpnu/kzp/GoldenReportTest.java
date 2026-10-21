@@ -10,6 +10,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,10 +27,10 @@ class GoldenReportTest {
     Path tempDir;
 
     private static String normalize(String text) {
-        return text.replace("\r\n", "\n")
-                .lines()
+        // Limit -1 keeps a trailing empty element, so a missing final newline stays visible.
+        return Arrays.stream(text.replace("\r\n", "\n").split("\n", -1))
                 .map(line -> line.startsWith(INPUT_LINE_PREFIX) ? line.replace('\\', '/') : line)
-                .collect(Collectors.joining("\n", "", "\n"));
+                .collect(Collectors.joining("\n"));
     }
 
     private static String golden() throws IOException {

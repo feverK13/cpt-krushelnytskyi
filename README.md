@@ -73,6 +73,17 @@ report with its line number and reason, and processing continues.
 
 Line numbers in the examples are illustrative.
 
+## Building a product in code
+
+`Product.builder()` collects the five fields and `build()` calls the validating constructor, so an
+invalid product cannot be created. Unset text fails with `NullPointerException`, unset numbers are 0.
+
+```java
+Product product = Product.builder()
+        .name("Монітор").category("Монітори").price(6499.00).warrantyMonths(36).stock(12)
+        .build();
+```
+
 ## Output
 
 Real output of `java -jar target/lab01-1.0.0.jar` for [data/input.csv](data/input.csv)
