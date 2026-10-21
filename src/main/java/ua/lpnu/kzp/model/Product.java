@@ -30,6 +30,9 @@ public final class Product {
     /**
      * Creates a product; name and category are stripped.
      *
+     * <p>Non-finite prices are rejected here for direct callers, while {@link #fromCsv} reports a
+     * price that overflows {@code double} as {@link ValidationError#TOO_LARGE}.</p>
+     *
      * @throws NullPointerException       if {@code name} or {@code category} is {@code null}
      * @throws ProductValidationException for the first failing field, checked in the order of the
      *                                    parameters (the Lab 1 order)
