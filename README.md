@@ -153,13 +153,15 @@ branches that the application's paths never reach.
 src/main/java/ua/lpnu/kzp
   Main, ConsoleStreams, AppVersion   entry point and orchestration, UTF-8 console, version info
   cli/      CliParser, CliParseResult   argument parsing
-  data/     CsvReader, RecordSplitter, RecordValidator, InputProcessor, LineResult,
-            RecordField, ValidationError   reading, splitting and validating lines
+  data/     CsvReader, InputProcessor   reading lines and building the list of products
+  model/    Product, WarrantyStock, ProductValidationException, RecordField, ValidationError
+            the entity with Product.fromCsv, its invariants and the validation reasons
   metrics/  MetricsCalculator, Metrics   the four metrics
   report/   ReportFormatter, ReportWriter   report text and report file
   logging/  AppLogger, AppLogFormatter, WriterHandler   log file and verbose mirror
 src/test/java      JUnit 5 tests
 src/test/resources/fixtures   CSV files for end-to-end tests
+src/test/resources/baseline   Lab 1 report compared by GoldenReportTest
 ai/                agent role definitions
 ```
 
