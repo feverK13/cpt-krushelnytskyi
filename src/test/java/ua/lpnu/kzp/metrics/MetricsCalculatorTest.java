@@ -1,5 +1,7 @@
 package ua.lpnu.kzp.metrics;
 
+import ua.lpnu.kzp.model.Product;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -19,8 +21,8 @@ class MetricsCalculatorTest {
 
     private static final double DELTA = 0.0001;
 
-    private static String[] record(String price, String warranty, String stock) {
-        return new String[] {"Товар", "Категорія", price, warranty, stock};
+    private static Product record(String price, String warranty, String stock) {
+        return Product.fromCsv("Товар;Категорія;" + price + ";" + warranty + ";" + stock);
     }
 
     static Stream<Arguments> datasets() {
@@ -34,7 +36,7 @@ class MetricsCalculatorTest {
                         new Metrics(3, 200.25, 24, 15L)),
                 Arguments.of(
                         "single record",
-                        List.<String[]>of(record("6499.00", "36", "12")),
+                        List.of(record("6499.00", "36", "12")),
                         new Metrics(1, 6499.00, 36, 12L)),
                 Arguments.of(
                         "average needing rounding",
@@ -54,7 +56,7 @@ class MetricsCalculatorTest {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("datasets")
-    void calculatesTheFourMetrics(String name, List<String[]> records, Metrics expected) {
+    void calculatesTheFourMetrics(String name, List<Product> records, Metrics expected) {
         Metrics actual = MetricsCalculator.calculate(records).orElseThrow();
 
         assertEquals(expected.validCount(), actual.validCount());

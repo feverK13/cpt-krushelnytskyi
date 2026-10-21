@@ -64,3 +64,12 @@ total stock (sum of `stock`, type long).
   `@param`/`@return`/`@throws` only when not obvious, no HTML lists that mirror the code.
 - Inline comments only for non-obvious reasons (why, not what); never restate the code.
 - No `// Arrange` / `// Act` / `// Assert` markers in tests.
+
+## Handoff clarity
+
+- Whenever I wait for the user, end the message with exactly one of:
+  - `YOUR ACTION: run <exact command> and paste <what>`
+  - `YOUR ACTION: reply push`
+  - `NOTHING needed from me, I continue`
+- State whether the action is required before push or optional.
+- No vague phrases such as "next is your step".

@@ -5,10 +5,15 @@ import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
@@ -263,5 +268,20 @@ class ProductTest {
         } finally {
             Locale.setDefault(original);
         }
+    }
+
+    @Test
+    void isImmutable() {
+        assertTrue(Modifier.isFinal(Product.class.getModifiers()));
+        for (Field field : Product.class.getDeclaredFields()) {
+            if (field.isSynthetic()) {
+                continue; // JaCoCo adds a synthetic $jacocoData field
+            }
+            assertTrue(Modifier.isPrivate(field.getModifiers()) && Modifier.isFinal(field.getModifiers()),
+                    field.getName());
+        }
+        assertTrue(Arrays.stream(Product.class.getDeclaredMethods())
+                .map(Method::getName)
+                .noneMatch(name -> name.startsWith("set")));
     }
 }

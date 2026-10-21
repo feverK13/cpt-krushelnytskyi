@@ -1,8 +1,10 @@
 package ua.lpnu.kzp.model;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 /**
  * An immutable, always valid item of the electronics store.
@@ -11,6 +13,13 @@ import java.util.Objects;
  * Lab 1 rejected a price of 0.</p>
  */
 public final class Product {
+
+    private static final int FIELD_COUNT = 5;
+    private static final String SEPARATOR = ";";
+    private static final Pattern DECIMAL = Pattern.compile("-?\\d+(\\.\\d+)?");
+    private static final Pattern INTEGER = Pattern.compile("-?\\d+");
+    private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
+    private static final BigInteger MIN_INT = BigInteger.valueOf(Integer.MIN_VALUE);
 
     private final String name;
     private final String category;
@@ -34,6 +43,93 @@ public final class Product {
         this.warrantyMonths = warrantyMonths;
         WarrantyStock.checkStock(stock);
         this.stock = stock;
+    }
+
+    /**
+     * Parses one CSV line {@code name;category;price;warrantyMonths;stock}; fields are trimmed.
+     *
+     * <p>Numbers are plain decimals ({@code -?\d+(\.\d+)?}); warranty and stock must fit into
+     * {@code int}. Each field is parsed and checked before the next one, so the first failing
+     * field wins.</p>
+     *
+     * @throws NullPointerException       if {@code line} is {@code null}
+     * @throws ProductValidationException for a blank line, a wrong field count or the first
+     *                                    invalid field; its {@link ProductValidationException#detail()
+     *                                    detail} is the raw field text, so the Lab 1 message can be
+     *                                    rendered from {@code field()}, {@code error()} and
+     *                                    {@code detail()}
+     */
+    public static Product fromCsv(String line) {
+        Objects.requireNonNull(line, "line");
+        if (line.isBlank()) {
+            throw new ProductValidationException(null, ValidationError.EMPTY_LINE, null);
+        }
+        String[] fields = line.split(SEPARATOR, -1);
+        if (fields.length != FIELD_COUNT) {
+            throw new ProductValidationException(
+                    null, ValidationError.FIELD_COUNT, String.valueOf(fields.length));
+        }
+        String name = checkName(fields[RecordField.NAME.index()]);
+        String category = checkCategory(fields[RecordField.CATEGORY.index()]);
+        double price = parsePrice(fields[RecordField.PRICE.index()].strip());
+        int warrantyMonths = parseInt(
+                RecordField.WARRANTY_MONTHS, fields[RecordField.WARRANTY_MONTHS.index()].strip());
+        int stock = parseInt(RecordField.STOCK, fields[RecordField.STOCK.index()].strip());
+        return new Product(name, category, price, warrantyMonths, stock);
+    }
+
+    private static double parsePrice(String raw) {
+        requirePresent(RecordField.PRICE, raw);
+        if (!DECIMAL.matcher(raw).matches()) {
+            throw new ProductValidationException(RecordField.PRICE, ValidationError.NOT_A_NUMBER, raw);
+        }
+        double price = Double.parseDouble(raw);
+        if (Double.isInfinite(price)) {
+            throw new ProductValidationException(RecordField.PRICE, ValidationError.TOO_LARGE, raw);
+        }
+        try {
+            checkPrice(price);
+        } catch (ProductValidationException e) {
+            throw withRawDetail(e, raw);
+        }
+        return price;
+    }
+
+    private static int parseInt(RecordField field, String raw) {
+        requirePresent(field, raw);
+        if (!INTEGER.matcher(raw).matches()) {
+            throw new ProductValidationException(
+                    field,
+                    DECIMAL.matcher(raw).matches() ? ValidationError.NOT_AN_INTEGER : ValidationError.NOT_A_NUMBER,
+                    raw);
+        }
+        BigInteger parsed = new BigInteger(raw);
+        if (parsed.compareTo(MAX_INT) > 0) {
+            throw new ProductValidationException(field, ValidationError.TOO_LARGE, raw);
+        }
+        // Below Integer.MIN_VALUE the value is clamped so the field check still reports NEGATIVE.
+        int value = parsed.max(MIN_INT).intValue();
+        try {
+            if (field == RecordField.WARRANTY_MONTHS) {
+                WarrantyStock.checkWarrantyMonths(value);
+            } else {
+                WarrantyStock.checkStock(value);
+            }
+        } catch (ProductValidationException e) {
+            throw withRawDetail(e, raw);
+        }
+        return value;
+    }
+
+    private static void requirePresent(RecordField field, String raw) {
+        if (raw.isEmpty()) {
+            throw new ProductValidationException(field, ValidationError.EMPTY_FIELD, null);
+        }
+    }
+
+    // Lab 1 quotes the field as written ("0.00", "-03"), not in canonical form.
+    private static ProductValidationException withRawDetail(ProductValidationException e, String raw) {
+        return new ProductValidationException(e.field(), e.error(), raw);
     }
 
     // null is a programming error, not bad input, so it is not a ProductValidationException.
