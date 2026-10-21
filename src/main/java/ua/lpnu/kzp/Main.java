@@ -129,7 +129,7 @@ public final class Main {
 
         InputProcessor.ProcessedInput input = InputProcessor.process(lines, logger);
 
-        Optional<Metrics> metrics = MetricsCalculator.calculate(input.records());
+        Optional<Metrics> metrics = MetricsCalculator.calculate(input.products());
         logger.info("Main.run", metrics.map(m -> "Metrics: " + m.summary())
                 .orElse("No valid records, metrics are not computed"));
 
