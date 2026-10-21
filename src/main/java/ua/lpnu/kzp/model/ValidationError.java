@@ -1,13 +1,12 @@
-package ua.lpnu.kzp.data;
+package ua.lpnu.kzp.model;
 
 import java.util.Locale;
 
 /**
  * Reason why a line was rejected.
  *
- * <p>Every reason carries two templates: a Ukrainian one for the message printed to the user and
- * an English one for the log record. A template may contain a single {@code %s} placeholder for
- * the offending value or count; reasons without a placeholder simply ignore the detail.</p>
+ * <p>Each reason has a Ukrainian template for the user and an English one for the log, with an
+ * optional {@code %s} for the offending value; templates without it ignore the detail.</p>
  */
 public enum ValidationError {
 
@@ -46,8 +45,7 @@ public enum ValidationError {
     /**
      * Renders the Ukrainian reason shown to the user.
      *
-     * @param detail offending value or count, may be {@code null} for reasons without a detail
-     * @return the rendered reason
+     * @param detail offending value or count, {@code null} for reasons without one
      */
     public String ukrainian(String detail) {
         return String.format(Locale.ROOT, ukrainianTemplate, detail);
@@ -56,8 +54,7 @@ public enum ValidationError {
     /**
      * Renders the English reason written to the log.
      *
-     * @param detail offending value or count, may be {@code null} for reasons without a detail
-     * @return the rendered reason
+     * @param detail offending value or count, {@code null} for reasons without one
      */
     public String english(String detail) {
         return String.format(Locale.ROOT, englishTemplate, detail);

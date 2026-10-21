@@ -1,4 +1,4 @@
-# Project rules: cpt-lab1-krushelnytskyi
+# Project rules: cpt-krushelnytskyi
 
 Java 21 console application, domain "Electronics store".
 Record: `name;category;price;warrantyMonths;stock` (String;String;double;int;int),
@@ -9,7 +9,7 @@ total stock (sum of `stock`, type long).
 ## Language
 - Code, javadoc, docs, commits, issues, PRs, logs: English.
 - Program report and skipped-line messages: Ukrainian, money in "грн".
-- REPORT.md is written in Ukrainian; do not edit it unless asked.
+- Lab reports (`docs/REPORT-lab1.md`, `docs/REPORT-lab2.md`) are written in Ukrainian; do not edit them unless asked.
 
 ## Build
 - Maven only through the Wrapper: `./mvnw -B clean verify` (Git Bash/Unix), `.\mvnw.cmd -B clean verify` (cmd).
@@ -19,7 +19,8 @@ total stock (sum of `stock`, type long).
 
 ## Hard rules
 - No entity classes (that is lab 2): records are String[] and primitives. Reading, validation,
-  calculation and formatting are separate methods or utility classes.
+  calculation and formatting are separate methods or utility classes. Lab 1 rule; Lab 2 allows
+  entity classes, see "Lab 2 rules" below.
 - Use `Path`, explicit UTF-8, `Locale.ROOT`, `%n`. No hard-coded path separators.
 - Validation: trim fields; name and category not blank; numbers must match `-?\d+(\.\d+)?`
   (no exponent, no f/d suffix, no NaN/Infinity); price > 0; warrantyMonths >= 0; stock >= 0;
@@ -45,3 +46,21 @@ total stock (sum of `stock`, type long).
   one logical change per commit. PR body contains `Closes #N`.
 - Show the diff and explain each change briefly. Do not push without confirmation.
 - Output style: terse. Do not recap steps already shown or restate file contents; report only command results, diffs and decisions that need my input.
+
+## Lab 2 rules
+
+- Behaviour preservation: report, metrics, error messages, their order and exit codes must
+  match the Lab 1 snapshot in `docs/baseline/lab1/`.
+- Validation rules live only in `Product` (constructor / `fromCsv`) and the records; no
+  duplicated validators.
+- Branches are `lab2/<issue-numbers>-<slug>`; one PR per group of Issues, body contains `Closes #N`.
+- Tick Issue acceptance criteria and the PR checklist at merge time, only for verified items.
+- No push without my explicit "push" message. No merging.
+- I run `./mvnw` myself with the `!` prefix when asked.
+
+## Comment policy
+
+- Javadoc on public API as the lab requires; keep it concise: one sentence of purpose,
+  `@param`/`@return`/`@throws` only when not obvious, no HTML lists that mirror the code.
+- Inline comments only for non-obvious reasons (why, not what); never restate the code.
+- No `// Arrange` / `// Act` / `// Assert` markers in tests.

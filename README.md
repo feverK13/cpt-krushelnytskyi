@@ -1,4 +1,4 @@
-# cpt-lab1-krushelnytskyi
+# cpt-krushelnytskyi
 
 Java 21 console application for the "Electronics store" domain. It reads a CSV file of product
 records, validates every line, computes four metrics over the valid records and writes a
@@ -180,4 +180,14 @@ number as `ci.build.number`; it goes into the JAR manifest (`Build-Number`) and 
 Every task is a GitHub Issue with acceptance criteria. A small group of related Issues is done
 on one branch (`<type>/<N>-<M>-<slug>`) with Conventional Commits. Each branch goes through a
 pull request with `Closes #N` and green CI, and is merged with a merge commit. Agent roles
-are described in [ai/](ai/); the lab report is in [REPORT.md](REPORT.md).
+are described in [ai/](ai/); lab reports are in [docs/](docs/).
+
+## Labs
+
+| Lab | Topic                          | Status                                                         |
+|---|---|---|
+| 1   | Deployment and data processing | Done, tag `v1.0.0`, [docs/REPORT-lab1.md](docs/REPORT-lab1.md) |
+| 2   | Classes, record, encapsulation | In progress                                                    |
+
+The Lab 1 output snapshot used to check behaviour preservation is in
+[docs/baseline/lab1/](docs/baseline/lab1/).

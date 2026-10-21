@@ -1,10 +1,9 @@
-package ua.lpnu.kzp.data;
+package ua.lpnu.kzp.model;
 
 /**
  * The five fields of a record, in the order in which they appear in the CSV line.
  *
- * <p>Each field knows its position, its Ukrainian label used in messages shown to the user, and
- * its English name used in log records.</p>
+ * <p>Each field has a Ukrainian label for user messages and an English name for log records.</p>
  */
 public enum RecordField {
 
@@ -33,29 +32,17 @@ public enum RecordField {
         this.csvName = csvName;
     }
 
-    /**
-     * Returns the zero-based position of this field inside a record.
-     *
-     * @return the field index
-     */
+    /** Returns the zero-based position of this field inside a record. */
     public int index() {
         return index;
     }
 
-    /**
-     * Returns the Ukrainian label used in messages shown to the user.
-     *
-     * @return the field label
-     */
+    /** Returns the Ukrainian label used in messages shown to the user. */
     public String label() {
         return label;
     }
 
-    /**
-     * Returns the English field name used in log records.
-     *
-     * @return the CSV field name
-     */
+    /** Returns the English field name used in log records. */
     public String csvName() {
         return csvName;
     }
