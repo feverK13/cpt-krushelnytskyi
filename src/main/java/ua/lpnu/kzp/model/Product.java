@@ -12,10 +12,15 @@ import java.util.regex.Pattern;
  * <p>Instances come from {@link #of}, {@link #fromCsv} or {@link #builder()}, which pick the
  * subtype from the category via {@link ProductKind}.</p>
  *
+ * <p>The class is sealed: the only subtypes are {@link Laptop}, {@link Peripheral} and
+ * {@link OtherProduct}, so a {@code switch} over them can be checked for exhaustiveness by the
+ * compiler. {@code OtherProduct} is the fallback for every category that is neither a laptop nor
+ * a peripheral, so any valid CSV line still yields a product.</p>
+ *
  * <p>Price must be {@code > 0}: this is a compliant refinement of the Lab 2 minimum rule, because
  * Lab 1 rejected a price of 0.</p>
  */
-public abstract class Product {
+public abstract sealed class Product permits Laptop, Peripheral, OtherProduct {
 
     private static final int FIELD_COUNT = 5;
     private static final String SEPARATOR = ";";

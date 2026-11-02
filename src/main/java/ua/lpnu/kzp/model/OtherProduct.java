@@ -4,7 +4,8 @@ package ua.lpnu.kzp.model;
 public final class OtherProduct extends Product {
 
     // Share of the price charged for each warranty year for all other products.
-    private static final double RATE_PER_YEAR = 0.02;
+    /** Share of the price charged per warranty year. */
+    public static final double RATE_PER_YEAR = 0.02;
 
     OtherProduct(String name, String category, double price, int warrantyMonths, int stock) {
         super(ProductKind.OTHER, name, category, price, warrantyMonths, stock);

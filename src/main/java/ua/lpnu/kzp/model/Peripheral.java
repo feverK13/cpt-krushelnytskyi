@@ -4,7 +4,8 @@ package ua.lpnu.kzp.model;
 public final class Peripheral extends Product {
 
     // Share of the price charged for each warranty year: peripherals are cheap to service.
-    private static final double RATE_PER_YEAR = 0.01;
+    /** Share of the price charged per warranty year. */
+    public static final double RATE_PER_YEAR = 0.01;
 
     Peripheral(String name, String category, double price, int warrantyMonths, int stock) {
         super(ProductKind.PERIPHERAL, name, category, price, warrantyMonths, stock);
