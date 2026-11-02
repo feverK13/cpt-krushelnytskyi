@@ -7,6 +7,7 @@ import ua.lpnu.kzp.data.InputProcessor;
 import ua.lpnu.kzp.logging.AppLogger;
 import ua.lpnu.kzp.metrics.Metrics;
 import ua.lpnu.kzp.metrics.MetricsCalculator;
+import ua.lpnu.kzp.metrics.WarrantyCostSummary;
 import ua.lpnu.kzp.report.ReportFormatter;
 import ua.lpnu.kzp.report.ReportWriter;
 
@@ -134,6 +135,12 @@ public final class Main {
                 .orElse("No valid records, metrics are not computed"));
 
         String report = ReportFormatter.format(run.input(), metrics, input.skippedMessages());
+        if (run.warrantyCost()) {
+            WarrantyCostSummary summary = WarrantyCostSummary.of(input.products());
+            logger.info("Main.run", "Warranty cost: " + summary.summary());
+            report = ReportFormatter.format(
+                    run.input(), metrics, input.skippedMessages(), summary);
+        }
         out.print(report);
         try {
             ReportWriter.write(run.output(), report);

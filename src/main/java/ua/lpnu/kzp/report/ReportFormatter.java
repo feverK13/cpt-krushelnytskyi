@@ -1,6 +1,8 @@
 package ua.lpnu.kzp.report;
 
 import ua.lpnu.kzp.metrics.Metrics;
+import ua.lpnu.kzp.metrics.WarrantyCostSummary;
+import ua.lpnu.kzp.model.ProductDescriber;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -62,5 +64,47 @@ public final class ReportFormatter {
             }
         }
         return report.toString();
+    }
+
+    /**
+     * Builds the report of {@link #format(Path, Optional, List)} followed by the warranty cost
+     * section.
+     *
+     * <p>The section starts with a blank line and the title {@code Гарантійна вартість:}. Each
+     * group has a row with the kind label, the count and the subtotal, then its policy text from
+     * {@link ProductDescriber}; a total row closes the section. Without groups the section says
+     * that there is nothing to calculate.</p>
+     *
+     * @param input           path of the processed input file
+     * @param metrics         computed metrics, or empty if there were no valid records
+     * @param skippedMessages Ukrainian skipped-line messages, in file order
+     * @param warrantyCost    warranty cost summary of the valid products
+     * @return the report text, ending with a line separator
+     */
+    public static String format(
+            Path input, Optional<Metrics> metrics, List<String> skippedMessages,
+            WarrantyCostSummary warrantyCost) {
+        return format(input, metrics, skippedMessages) + warrantyCostSection(warrantyCost);
+    }
+
+    private static String warrantyCostSection(WarrantyCostSummary summary) {
+        StringBuilder section = new StringBuilder();
+        section.append(String.format(Locale.ROOT, "%nГарантійна вартість:%n"));
+        if (summary.groups().isEmpty()) {
+            section.append(String.format(Locale.ROOT, "Немає коректних записів для розрахунку.%n"));
+            return section.toString();
+        }
+        for (WarrantyCostSummary.Group group : summary.groups()) {
+            section.append(String.format(
+                    Locale.ROOT, ROW,
+                    group.kind().label() + ", шт.: " + group.count(),
+                    String.format(Locale.ROOT, "%.2f грн", group.subtotal())));
+            section.append(String.format(
+                    Locale.ROOT, "  %s%n", ProductDescriber.describe(group.representative())));
+        }
+        section.append(String.format(Locale.ROOT, "%s%n", "-".repeat(TABLE_WIDTH)));
+        section.append(String.format(
+                Locale.ROOT, ROW, "Разом", String.format(Locale.ROOT, "%.2f грн", summary.total())));
+        return section.toString();
     }
 }
