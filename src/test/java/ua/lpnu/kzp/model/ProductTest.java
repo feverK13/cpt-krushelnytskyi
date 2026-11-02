@@ -40,7 +40,7 @@ class ProductTest {
         String name = NAME;
         String category = CATEGORY;
 
-        Product product = new Product(name, category, 24999.00, 24, 7);
+        Product product = Product.of(name, category, 24999.00, 24, 7);
 
         assertEquals(NAME, product.getName());
         assertEquals(CATEGORY, product.getCategory());
@@ -51,7 +51,7 @@ class ProductTest {
 
     @Test
     void trimsNameAndCategory() {
-        Product product = new Product("  " + NAME + "\t", " \t" + CATEGORY + "  ", 1, 1, 1);
+        Product product = Product.of("  " + NAME + "\t", " \t" + CATEGORY + "  ", 1, 1, 1);
 
         assertEquals(NAME, product.getName());
         assertEquals(CATEGORY, product.getCategory());
@@ -59,7 +59,7 @@ class ProductTest {
 
     @Test
     void exposesWarrantyAndStockAsRecord() {
-        Product product = new Product(NAME, CATEGORY, 100, 24, 7);
+        Product product = Product.of(NAME, CATEGORY, 100, 24, 7);
 
         WarrantyStock value = product.warrantyStock();
 
@@ -68,18 +68,18 @@ class ProductTest {
 
     @Test
     void rejectsNullName() {
-        assertThrows(NullPointerException.class, () -> new Product(null, CATEGORY, 1, 1, 1));
+        assertThrows(NullPointerException.class, () -> Product.of(null, CATEGORY, 1, 1, 1));
     }
 
     @Test
     void rejectsNullCategory() {
-        assertThrows(NullPointerException.class, () -> new Product(NAME, null, 1, 1, 1));
+        assertThrows(NullPointerException.class, () -> Product.of(NAME, null, 1, 1, 1));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"", " ", "\t", " \t ", " "})
     void rejectsBlankName(String name) {
-        ProductValidationException e = reject(() -> new Product(name, CATEGORY, 1, 1, 1));
+        ProductValidationException e = reject(() -> Product.of(name, CATEGORY, 1, 1, 1));
 
         assertRejected(e, RecordField.NAME, ValidationError.EMPTY_FIELD);
         assertNull(e.detail());
@@ -88,7 +88,7 @@ class ProductTest {
     @ParameterizedTest
     @ValueSource(strings = {"", " ", "\t", " \t ", " "})
     void rejectsBlankCategory(String category) {
-        ProductValidationException e = reject(() -> new Product(NAME, category, 1, 1, 1));
+        ProductValidationException e = reject(() -> Product.of(NAME, category, 1, 1, 1));
 
         assertRejected(e, RecordField.CATEGORY, ValidationError.EMPTY_FIELD);
         assertNull(e.detail());
@@ -97,7 +97,7 @@ class ProductTest {
     @ParameterizedTest
     @ValueSource(doubles = {0.01, 1, 1.5, 24999.00, Double.MAX_VALUE, Double.MIN_VALUE})
     void acceptsPositivePrice(double price) {
-        Product product = new Product(NAME, CATEGORY, price, 1, 1);
+        Product product = Product.of(NAME, CATEGORY, price, 1, 1);
 
         assertEquals(price, product.getPrice());
     }
@@ -105,7 +105,7 @@ class ProductTest {
     @ParameterizedTest
     @ValueSource(doubles = {0.0, -0.0})
     void rejectsZeroPriceAsNotPositive(double price) {
-        ProductValidationException e = reject(() -> new Product(NAME, CATEGORY, price, 1, 1));
+        ProductValidationException e = reject(() -> Product.of(NAME, CATEGORY, price, 1, 1));
 
         assertRejected(e, RecordField.PRICE, ValidationError.NOT_POSITIVE);
         assertEquals("0.0", e.detail());
@@ -114,14 +114,14 @@ class ProductTest {
     @ParameterizedTest
     @ValueSource(doubles = {-0.01, -1, -24999.00, -Double.MAX_VALUE})
     void rejectsNegativePrice(double price) {
-        ProductValidationException e = reject(() -> new Product(NAME, CATEGORY, price, 1, 1));
+        ProductValidationException e = reject(() -> Product.of(NAME, CATEGORY, price, 1, 1));
 
         assertRejected(e, RecordField.PRICE, ValidationError.NEGATIVE);
     }
 
     @Test
     void formatsNegativePriceDetailCanonically() {
-        ProductValidationException e = reject(() -> new Product(NAME, CATEGORY, -0.01, 1, 1));
+        ProductValidationException e = reject(() -> Product.of(NAME, CATEGORY, -0.01, 1, 1));
 
         assertEquals("-0.01", e.detail());
     }
@@ -129,7 +129,7 @@ class ProductTest {
     @Test
     void rejectsNaNPrice() {
         ProductValidationException e =
-                reject(() -> new Product(NAME, CATEGORY, Double.NaN, 1, 1));
+                reject(() -> Product.of(NAME, CATEGORY, Double.NaN, 1, 1));
 
         assertRejected(e, RecordField.PRICE, ValidationError.NOT_A_NUMBER);
         assertEquals("NaN", e.detail());
@@ -138,7 +138,7 @@ class ProductTest {
     @ParameterizedTest
     @ValueSource(doubles = {Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY})
     void rejectsInfinitePrice(double price) {
-        ProductValidationException e = reject(() -> new Product(NAME, CATEGORY, price, 1, 1));
+        ProductValidationException e = reject(() -> Product.of(NAME, CATEGORY, price, 1, 1));
 
         assertRejected(e, RecordField.PRICE, ValidationError.TOO_LARGE);
     }
@@ -146,7 +146,7 @@ class ProductTest {
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 36, Integer.MAX_VALUE})
     void acceptsNonNegativeWarranty(int warranty) {
-        Product product = new Product(NAME, CATEGORY, 1, warranty, 1);
+        Product product = Product.of(NAME, CATEGORY, 1, warranty, 1);
 
         assertEquals(warranty, product.getWarrantyMonths());
     }
@@ -154,7 +154,7 @@ class ProductTest {
     @ParameterizedTest
     @ValueSource(ints = {-1, -12, Integer.MIN_VALUE})
     void rejectsNegativeWarranty(int warranty) {
-        ProductValidationException e = reject(() -> new Product(NAME, CATEGORY, 1, warranty, 1));
+        ProductValidationException e = reject(() -> Product.of(NAME, CATEGORY, 1, warranty, 1));
 
         assertRejected(e, RecordField.WARRANTY_MONTHS, ValidationError.NEGATIVE);
         assertEquals(Integer.toString(warranty), e.detail());
@@ -163,7 +163,7 @@ class ProductTest {
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 75, Integer.MAX_VALUE})
     void acceptsNonNegativeStock(int stock) {
-        Product product = new Product(NAME, CATEGORY, 1, 1, stock);
+        Product product = Product.of(NAME, CATEGORY, 1, 1, stock);
 
         assertEquals(stock, product.getStock());
     }
@@ -171,7 +171,7 @@ class ProductTest {
     @ParameterizedTest
     @ValueSource(ints = {-1, -3, Integer.MIN_VALUE})
     void rejectsNegativeStock(int stock) {
-        ProductValidationException e = reject(() -> new Product(NAME, CATEGORY, 1, 1, stock));
+        ProductValidationException e = reject(() -> Product.of(NAME, CATEGORY, 1, 1, stock));
 
         assertRejected(e, RecordField.STOCK, ValidationError.NEGATIVE);
         assertEquals(Integer.toString(stock), e.detail());
@@ -179,56 +179,56 @@ class ProductTest {
 
     @Test
     void acceptsZeroWarrantyAndZeroStockTogether() {
-        Product product = new Product(NAME, CATEGORY, 0.01, 0, 0);
+        Product product = Product.of(NAME, CATEGORY, 0.01, 0, 0);
 
         assertEquals(new WarrantyStock(0, 0), product.warrantyStock());
     }
 
     @Test
     void blankNameWinsOverBadPrice() {
-        ProductValidationException e = reject(() -> new Product(" ", CATEGORY, -5, 1, 1));
+        ProductValidationException e = reject(() -> Product.of(" ", CATEGORY, -5, 1, 1));
 
         assertRejected(e, RecordField.NAME, ValidationError.EMPTY_FIELD);
     }
 
     @Test
     void blankCategoryWinsOverBadPrice() {
-        ProductValidationException e = reject(() -> new Product(NAME, "", 0, 1, 1));
+        ProductValidationException e = reject(() -> Product.of(NAME, "", 0, 1, 1));
 
         assertRejected(e, RecordField.CATEGORY, ValidationError.EMPTY_FIELD);
     }
 
     @Test
     void blankNameWinsOverBlankCategory() {
-        ProductValidationException e = reject(() -> new Product("", "", 1, 1, 1));
+        ProductValidationException e = reject(() -> Product.of("", "", 1, 1, 1));
 
         assertEquals(RecordField.NAME, e.field());
     }
 
     @Test
     void badPriceWinsOverBadWarrantyAndStock() {
-        ProductValidationException e = reject(() -> new Product(NAME, CATEGORY, 0, -1, -1));
+        ProductValidationException e = reject(() -> Product.of(NAME, CATEGORY, 0, -1, -1));
 
         assertRejected(e, RecordField.PRICE, ValidationError.NOT_POSITIVE);
     }
 
     @Test
     void badWarrantyWinsOverBadStock() {
-        ProductValidationException e = reject(() -> new Product(NAME, CATEGORY, 1, -1, -1));
+        ProductValidationException e = reject(() -> Product.of(NAME, CATEGORY, 1, -1, -1));
 
         assertRejected(e, RecordField.WARRANTY_MONTHS, ValidationError.NEGATIVE);
     }
 
     @Test
     void everythingInvalidReportsName() {
-        ProductValidationException e = reject(() -> new Product("", "", -1, -1, -1));
+        ProductValidationException e = reject(() -> Product.of("", "", -1, -1, -1));
 
         assertEquals(RecordField.NAME, e.field());
     }
 
     @Test
     void toStringListsAllFieldsWithTwoDecimals() {
-        Product product = new Product(NAME, CATEGORY, 24999, 24, 7);
+        Product product = Product.of(NAME, CATEGORY, 24999, 24, 7);
 
         String text = product.toString();
 
@@ -241,7 +241,7 @@ class ProductTest {
     @Test
     void toStringIgnoresDefaultLocale() {
         Locale original = Locale.getDefault();
-        Product product = new Product(NAME, CATEGORY, 1234.5, 12, 3);
+        Product product = Product.of(NAME, CATEGORY, 1234.5, 12, 3);
         try {
             Locale.setDefault(Locale.GERMANY);
 
@@ -262,7 +262,7 @@ class ProductTest {
         try {
             Locale.setDefault(Locale.GERMANY);
 
-            ProductValidationException e = reject(() -> new Product(NAME, CATEGORY, -1234.5, 1, 1));
+            ProductValidationException e = reject(() -> Product.of(NAME, CATEGORY, -1234.5, 1, 1));
 
             assertEquals("-1234.5", e.detail());
         } finally {
@@ -272,7 +272,11 @@ class ProductTest {
 
     @Test
     void isImmutable() {
-        assertTrue(Modifier.isFinal(Product.class.getModifiers()));
+        assertTrue(Modifier.isAbstract(Product.class.getModifiers()));
+        for (Class<?> subtype : new Class<?>[] {Laptop.class, Peripheral.class, OtherProduct.class}) {
+            assertTrue(Modifier.isFinal(subtype.getModifiers()), subtype.getName());
+            assertEquals(0, Arrays.stream(subtype.getDeclaredFields()).filter(f -> !f.isSynthetic()).count());
+        }
         for (Field field : Product.class.getDeclaredFields()) {
             if (field.isSynthetic()) {
                 continue; // JaCoCo adds a synthetic $jacocoData field
