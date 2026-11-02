@@ -8,7 +8,7 @@ import java.util.Locale;
  * Parses command line arguments into a {@link CliParseResult}.
  *
  * <p>Recognised options: {@code --help}, {@code --version}, {@code --input <path>},
- * {@code --output <path>}, {@code --verbose}. {@code --help} takes precedence over every other
+ * {@code --output <path>}, {@code --verbose}, {@code --warranty-cost}. {@code --help} takes precedence over every other
  * argument, and {@code --version} takes precedence over any parsing error.</p>
  */
 public final class CliParser {
@@ -24,6 +24,7 @@ public final class CliParser {
     private static final String INPUT_OPTION = "--input";
     private static final String OUTPUT_OPTION = "--output";
     private static final String VERBOSE_OPTION = "--verbose";
+    private static final String WARRANTY_COST_OPTION = "--warranty-cost";
 
     private CliParser() {
     }
@@ -49,6 +50,7 @@ public final class CliParser {
         Path input = DEFAULT_INPUT;
         Path output = DEFAULT_OUTPUT;
         boolean verbose = false;
+        boolean warrantyCost = false;
 
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
@@ -66,13 +68,14 @@ public final class CliParser {
                     output = Path.of(args[++i]);
                 }
                 case VERBOSE_OPTION -> verbose = true;
+                case WARRANTY_COST_OPTION -> warrantyCost = true;
                 default -> {
                     return unknownArgumentError(arg);
                 }
             }
         }
 
-        return new CliParseResult.Run(input, output, verbose);
+        return new CliParseResult.Run(input, output, verbose, warrantyCost);
     }
 
     private static final List<String> USAGE_LINES = List.of(
@@ -83,7 +86,8 @@ public final class CliParser {
             "  --version           показати версію програми та завершити роботу",
             "  --input <шлях>      шлях до вхідного CSV-файлу (типово: data/input.csv)",
             "  --output <шлях>     шлях до файлу звіту (типово: out/report.txt)",
-            "  --verbose           дублювати журнал подій у stderr");
+            "  --verbose           дублювати журнал подій у stderr",
+            "  --warranty-cost     додати до звіту розділ \"Гарантійна вартість:\"");
 
     /**
      * Renders the Ukrainian usage text shown for {@code --help}.

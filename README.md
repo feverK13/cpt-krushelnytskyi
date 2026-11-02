@@ -26,6 +26,7 @@ Console output is always UTF-8; legacy `cmd.exe` needs `chcp 65001` to display i
 | `--input <path>` | Input CSV file | `data/input.csv` |
 | `--output <path>` | Report file | `out/report.txt` |
 | `--verbose` | Mirror log records to stderr | off |
+| `--warranty-cost` | Append the "Гарантійна вартість:" section to the report | off |
 
 `--help` takes precedence over every other argument, `--version` over any argument error;
 neither creates files.
@@ -158,6 +159,28 @@ skipped lines in file order. The same text is written to the `--output` file in 
 parent directories are created. Without valid records the table is replaced by
 `Немає жодного коректного запису.`
 
+## Warranty cost section
+
+With `--warranty-cost` the normal report is printed unchanged and a section is appended: for each
+product kind that has valid products (laptop, peripheral, other) the count, the sum of
+`warrantyCost()` and the warranty policy in words, then the total. Without valid records the
+section says `Немає коректних записів для розрахунку.`
+
+```text
+Гарантійна вартість:
+Ноутбук, шт.: 1                         1699.94 грн
+  3% ціни за кожен рік гарантії + 100 грн за кожен розпочатий рік
+Периферія, шт.: 3                        415.95 грн
+  1% ціни за кожен рік гарантії
+Інше, шт.: 4                            2790.93 грн
+  2% ціни за кожен рік гарантії
+---------------------------------------------------
+Разом                                   4906.82 грн
+```
+
+Rules: laptop 3% of the price per warranty year plus 100 UAH per started year, peripheral 1%,
+other 2%; 0 when the warranty is 0 months; each cost is rounded to 2 decimals.
+
 ## Exit codes
 
 | Code | Meaning |
@@ -208,9 +231,11 @@ src/main/java/ua/lpnu/kzp
   Main, ConsoleStreams, AppVersion   entry point and orchestration, UTF-8 console, version info
   cli/      CliParser, CliParseResult   argument parsing
   data/     CsvReader, InputProcessor   reading lines and building the list of products
-  model/    Product, WarrantyStock, ProductValidationException, RecordField, ValidationError
-            the entity with Product.fromCsv, its invariants and the validation reasons
-  metrics/  MetricsCalculator, Metrics   the four metrics
+  model/    Product (sealed), Laptop, Peripheral, OtherProduct, ProductKind, ProductDescriber,
+            WarrantyStock, ProductValidationException, RecordField, ValidationError
+            the entity hierarchy with Product.of and Product.fromCsv, its invariants and the
+            validation reasons
+  metrics/  MetricsCalculator, Metrics, WarrantyCostSummary   the four metrics, warranty cost
   report/   ReportFormatter, ReportWriter   report text and report file
   logging/  AppLogger, AppLogFormatter, WriterHandler   log file and verbose mirror
 src/test/java      JUnit 5 tests

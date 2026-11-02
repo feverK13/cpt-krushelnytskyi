@@ -21,8 +21,15 @@ public sealed interface CliParseResult {
      * @param input   resolved input CSV path
      * @param output  resolved report output path
      * @param verbose whether log records must also be mirrored to stderr
+     * @param warrantyCost whether the warranty cost section must be appended to the report
      */
-    record Run(Path input, Path output, boolean verbose) implements CliParseResult {
+    record Run(Path input, Path output, boolean verbose, boolean warrantyCost)
+            implements CliParseResult {
+
+        /** Creates a configuration without the warranty cost section. */
+        public Run(Path input, Path output, boolean verbose) {
+            this(input, output, verbose, false);
+        }
     }
 
     /**
