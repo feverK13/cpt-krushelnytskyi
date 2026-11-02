@@ -257,6 +257,19 @@ public abstract class Product {
         return new WarrantyStock(warrantyMonths, stock);
     }
 
+    /**
+     * Returns the cost of the warranty in UAH, rounded to two decimals.
+     *
+     * <p>The value is never negative and is 0 when {@link #getWarrantyMonths()} is 0. The rule
+     * depends on the subtype.</p>
+     */
+    public abstract double warrantyCost();
+
+    /** Rounds a UAH amount to two decimals; shared by the {@link #warrantyCost()} overrides. */
+    static double roundMoney(double amount) {
+        return Math.round(amount * 100.0) / 100.0;
+    }
+
     /** Renders the product for diagnostics, with a locale-independent two-decimal price. */
     @Override
     public String toString() {
