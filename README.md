@@ -12,8 +12,8 @@ JDK 21. No Maven installation is needed: the build uses the Maven Wrapper (`mvnw
 
 | Shell | Build | Run |
 |---|---|---|
-| Windows (cmd, PowerShell) | `.\mvnw.cmd -B clean verify` | `java -jar target/lab01-1.1.0.jar` |
-| Unix, Git Bash | `./mvnw -B clean verify` | `java -jar target/lab01-1.1.0.jar` |
+| Windows (cmd, PowerShell) | `.\mvnw.cmd -B clean verify` | `java -jar target/lab01-1.2.0.jar` |
+| Unix, Git Bash | `./mvnw -B clean verify` | `java -jar target/lab01-1.2.0.jar` |
 
 Console output is always UTF-8; legacy `cmd.exe` needs `chcp 65001` to display it correctly.
 
@@ -128,7 +128,7 @@ compact constructor rejects negative values; `Product.warrantyStock()` returns o
 
 ## Output
 
-Real output of `java -jar target/lab01-1.1.0.jar` for [data/input.csv](data/input.csv)
+Real output of `java -jar target/lab01-1.2.0.jar` for [data/input.csv](data/input.csv)
 (run on Windows; on Unix the path is printed as `data/input.csv`):
 
 ```text
@@ -199,7 +199,7 @@ field. ERROR records include the stack trace. If the log file cannot be created,
 printed to stderr and the run continues.
 
 ```text
-2026-10-06T22:30:27.829+03:00 | INFO | Main.run | line=- field=- | Application started, version 1.1.0
+2026-10-06T22:30:27.829+03:00 | INFO | Main.run | line=- field=- | Application started, version 1.2.0
 2026-10-06T22:30:27.857+03:00 | WARN | InputProcessor.process | line=3 field=price | Skipped line: not a number: "абв"
 ```
 
@@ -252,10 +252,10 @@ cached. SpotBugs runs in `verify` and fails the build on findings. Each runner u
 shaded JAR as `jar-<os>-build-<N>`, where `N` is the workflow run number; `ubuntu-latest`
 also uploads `jacoco-report`. The job fails if the tests created `out/` in the project directory.
 
-The version is set in `pom.xml` (`1.1.0`) and a `v*` tag triggers CI. CI passes the run
+The version is set in `pom.xml` (`1.2.0`) and a `v*` tag triggers CI. CI passes the run
 number as `ci.build.number`; it goes into the JAR manifest (`Build-Number`) and into
-`--version`, which prints `1.1.0 (build 12)` in CI and `1.1.0 (build local)` for local builds.
-The version in `pom.xml`, in the tag `v1.1.0` and in the `--version` output is the same.
+`--version`, which prints `1.2.0 (build 12)` in CI and `1.2.0 (build local)` for local builds.
+The version in `pom.xml`, in the tag `v1.2.0` and in the `--version` output is the same.
 
 ## Workflow
 
