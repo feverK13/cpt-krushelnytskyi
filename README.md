@@ -244,7 +244,7 @@ are described in [ai/](ai/); lab reports are in [docs/](docs/).
 | Lab | Topic                          | Status                                                         |
 |---|---|---|
 | 1   | Deployment and data processing | Done, tag `v1.0.0`, [docs/REPORT-lab1.md](docs/REPORT-lab1.md) |
-| 2   | Classes, record, encapsulation | Done, tag `v1.1.0`, [REPORT.md](REPORT.md)                     |
+| 2   | Classes, record, encapsulation | Done, tag `v1.1.0`, [docs/REPORT-lab2.md](docs/REPORT-lab2.md) |
 
 The Lab 1 output snapshot used to check behaviour preservation is in
 [docs/baseline/lab1/](docs/baseline/lab1/).
