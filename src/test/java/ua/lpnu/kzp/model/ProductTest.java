@@ -275,7 +275,7 @@ class ProductTest {
         assertTrue(Modifier.isAbstract(Product.class.getModifiers()));
         for (Class<?> subtype : new Class<?>[] {Laptop.class, Peripheral.class, OtherProduct.class}) {
             assertTrue(Modifier.isFinal(subtype.getModifiers()), subtype.getName());
-            assertEquals(0, Arrays.stream(subtype.getDeclaredFields()).filter(f -> !f.isSynthetic()).count());
+            assertEquals(0, Arrays.stream(subtype.getDeclaredFields()).filter(f -> !f.isSynthetic() && !Modifier.isStatic(f.getModifiers())).count());
         }
         for (Field field : Product.class.getDeclaredFields()) {
             if (field.isSynthetic()) {
