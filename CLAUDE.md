@@ -58,6 +58,30 @@ total stock (sum of `stock`, type long).
 - No push without my explicit "push" message. No merging.
 - I run `./mvnw` myself with the `!` prefix when asked.
 
+## Lab 3 rules
+
+Variant 10 "Магазин техніки": inheritance, interfaces, polymorphism. Lab 2 rules above stay in force.
+
+- `Product` becomes an abstract base class (later sealed). Subtypes: `Laptop`, `Peripheral`,
+  `OtherProduct` (fallback). Subtypes contain no validation and no field duplication.
+- All Lab 2 validation, check order and `ProductValidationException` messages stay in the base.
+  The default report output and error messages stay byte-identical to Lab 2
+  (`docs/baseline/lab2/`); the golden test must stay green unchanged.
+- `ProductKind` enum: label, CSV categories, creator, `fromCategory` never throws,
+  unknown maps to `OTHER`. Compare enums with `==`.
+- Factories on `Product`: `fromCsv`, `of(...)` replacing the public constructor, `builder()`.
+  Old tests are migrated, never deleted or weakened.
+- Polymorphic `warrantyCost()`: `Laptop` 3% of price per warranty year plus 100 UAH per started
+  year; `Peripheral` 1% per year; `OtherProduct` 2% per year; 0 when `warrantyMonths` is 0.
+  No if/switch on subtype for it.
+- `equals`/`hashCode`: same class and all five fields (`Double.compare` for price); different
+  subtypes are never equal; covered by `HashSet` and `HashMap` tests.
+- New optional CLI flag `--warranty-cost` adds a "Гарантійна вартість:" section; without it the
+  output is unchanged.
+- Star task: sealed hierarchy and exhaustive `switch` with pattern matching and no `default`.
+- Version 1.2.0, tag `v1.2.0`, same release and CI-artifact flow as Lab 2.
+- Branches `lab3/<issue-numbers>-<slug>`; the prep branch is `chore/lab3-prep`.
+
 ## Comment policy
 
 - Javadoc on public API as the lab requires; keep it concise: one sentence of purpose,
