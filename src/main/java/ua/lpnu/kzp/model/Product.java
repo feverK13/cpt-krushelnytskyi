@@ -257,6 +257,50 @@ public abstract class Product {
         return new WarrantyStock(warrantyMonths, stock);
     }
 
+    /**
+     * Returns the cost of the warranty in UAH, rounded to two decimals.
+     *
+     * <p>The value is never negative and is 0 when {@link #getWarrantyMonths()} is 0. The rule
+     * depends on the subtype.</p>
+     */
+    public abstract double warrantyCost();
+
+    /** Rounds a UAH amount to two decimals; shared by the {@link #warrantyCost()} overrides. */
+    static double roundMoney(double amount) {
+        return Math.round(amount * 100.0) / 100.0;
+    }
+
+    /**
+     * Compares two products for equality.
+     *
+     * <p>Two products are equal if and only if they have exactly the same class and all five
+     * fields are equal: name, category, price (by {@link Double#compare}), warrantyMonths and
+     * stock. Products of different subtypes are never equal, even with identical fields. The
+     * relation is reflexive, symmetric, transitive and consistent, and {@code null} is never
+     * equal; all fields are immutable.</p>
+     */
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Product other = (Product) o;
+        return Objects.equals(name, other.name)
+                && Objects.equals(category, other.category)
+                && Double.compare(price, other.price) == 0
+                && warrantyMonths == other.warrantyMonths
+                && stock == other.stock;
+    }
+
+    /** Hashes the same five fields as {@link #equals}; the class is not mixed in. */
+    @Override
+    public final int hashCode() {
+        return Objects.hash(name, category, Double.hashCode(price), warrantyMonths, stock);
+    }
+
     /** Renders the product for diagnostics, with a locale-independent two-decimal price. */
     @Override
     public String toString() {
