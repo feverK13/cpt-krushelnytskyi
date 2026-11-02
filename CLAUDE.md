@@ -80,7 +80,7 @@ Variant 10 "Магазин техніки": inheritance, interfaces, polymorphis
   output is unchanged.
 - Star task: sealed hierarchy and exhaustive `switch` with pattern matching and no `default`.
 - Version 1.2.0, tag `v1.2.0`, same release and CI-artifact flow as Lab 2.
-- Branches `lab3/<issue-numbers>-<slug>`; the prep branch is `chore/lab3-prep`.
+- Branches are `feat/<slug>`, `chore/<slug>` and `docs/<slug>`; the prep branch was `chore/lab3-prep`.
 
 ## Comment policy
 
