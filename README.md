@@ -205,7 +205,7 @@ printed to stderr and the run continues.
 
 ## Testing
 
-`./mvnw -B clean verify` runs 358 JUnit 5 tests, many of them parameterized:
+`./mvnw -B clean verify` runs 432 JUnit 5 tests, many of them parameterized:
 
 | Area | Covered |
 |---|---|
@@ -256,6 +256,59 @@ The version is set in `pom.xml` (`1.2.0`) and a `v*` tag triggers CI. CI passes 
 number as `ci.build.number`; it goes into the JAR manifest (`Build-Number`) and into
 `--version`, which prints `1.2.0 (build 12)` in CI and `1.2.0 (build local)` for local builds.
 The version in `pom.xml`, in the tag `v1.2.0` and in the `--version` output is the same.
+
+## Lab 3: class hierarchy
+
+```mermaid
+classDiagram
+    class Product {
+        <<abstract, sealed>>
+        +of(...) Product
+        +fromCsv(String) Product
+        +builder() Builder
+        +kind() ProductKind
+        +warrantyCost() double
+    }
+    class Laptop { <<final>> }
+    class Peripheral { <<final>> }
+    class OtherProduct { <<final>> }
+    class ProductKind {
+        <<enumeration>>
+        LAPTOP
+        PERIPHERAL
+        OTHER
+        +fromCategory(String) ProductKind
+    }
+    class ProductDescriber { +describe(Product) String }
+    class WarrantyCostSummary { +of(List~Product~) WarrantyCostSummary }
+    Product <|-- Laptop
+    Product <|-- Peripheral
+    Product <|-- OtherProduct
+    Product --> ProductKind
+    ProductDescriber ..> Product
+    WarrantyCostSummary ..> Product
+```
+
+- The kind is derived from the CSV category (`ProductKind.fromCategory`); an unknown category
+  gives `OTHER`, so every valid line still yields a product.
+- All validation, its order and its messages live only in the base class `Product`; the
+  subtypes add no fields and no checks.
+- `warrantyCost()` is polymorphic: each subtype overrides it, there is no `switch` or
+  `instanceof` in the calculation.
+- Two products are equal if they have the same class and all five fields; subtypes never equal.
+- `Product` is sealed. The only exhaustive `switch` without `default` is in `ProductDescriber`
+  (presentation), so a new subtype is a compile error until it is described there.
+- The CSV format and the default report are unchanged from Lab 2.
+
+| Subtype | Warranty cost (`years = warrantyMonths / 12`) |
+|---|---|
+| `Laptop` | `price * 0.03 * years + 100 * ceil(years)` |
+| `Peripheral` | `price * 0.01 * years` |
+| `OtherProduct` | `price * 0.02 * years` |
+
+The result is in UAH, rounded to 2 decimals, and 0 when the warranty is 0 months. Run
+`java -jar target/lab01-1.2.0.jar --warranty-cost` to append the section to the report; the
+output for the sample file is in [docs/baseline/lab3/](docs/baseline/lab3/).
 
 ## Workflow
 
