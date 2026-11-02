@@ -57,6 +57,16 @@ public abstract class Product {
         checkKind(kind, this.category);
     }
 
+    /**
+     * Blocks finalizer attacks on a partially constructed product; the constructor can throw
+     * (SpotBugs {@code CT_CONSTRUCTOR_THROW}) and the class cannot be final.
+     */
+    @Override
+    @SuppressWarnings({"removal", "deprecation"})
+    protected final void finalize() {
+        // intentionally empty
+    }
+
     // A static helper keeps the throw out of the constructor body (SpotBugs CT_CONSTRUCTOR_THROW).
     private static void checkKind(ProductKind kind, String category) {
         if (!kind.accepts(category)) {
