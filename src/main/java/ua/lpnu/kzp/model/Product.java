@@ -9,10 +9,13 @@ import java.util.regex.Pattern;
 /**
  * An immutable, always valid item of the electronics store.
  *
+ * <p>Instances come from {@link #of}, {@link #fromCsv} or {@link #builder()}, which pick the
+ * subtype from the category via {@link ProductKind}.</p>
+ *
  * <p>Price must be {@code > 0}: this is a compliant refinement of the Lab 2 minimum rule, because
  * Lab 1 rejected a price of 0.</p>
  */
-public final class Product {
+public abstract class Product {
 
     private static final int FIELD_COUNT = 5;
     private static final String SEPARATOR = ";";
@@ -21,6 +24,7 @@ public final class Product {
     private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
     private static final BigInteger MIN_INT = BigInteger.valueOf(Integer.MIN_VALUE);
 
+    private final ProductKind kind;
     private final String name;
     private final String category;
     private final double price;
@@ -28,16 +32,20 @@ public final class Product {
     private final int stock;
 
     /**
-     * Creates a product; name and category are stripped.
+     * Validates and stores the fields; name and category are stripped.
      *
      * <p>Non-finite prices are rejected here for direct callers, while {@link #fromCsv} reports a
-     * price that overflows {@code double} as {@link ValidationError#TOO_LARGE}.</p>
+     * price that overflows {@code double} as {@link ValidationError#TOO_LARGE}. After the field
+     * checks the category must belong to {@code kind}, which only a direct subtype constructor
+     * can violate.</p>
      *
      * @throws NullPointerException       if {@code name} or {@code category} is {@code null}
      * @throws ProductValidationException for the first failing field, checked in the order of the
      *                                    parameters (the Lab 1 order)
      */
-    public Product(String name, String category, double price, int warrantyMonths, int stock) {
+    protected Product(
+            ProductKind kind, String name, String category, double price, int warrantyMonths, int stock) {
+        this.kind = Objects.requireNonNull(kind, "kind");
         this.name = checkName(name);
         this.category = checkCategory(category);
         checkPrice(price);
@@ -46,6 +54,35 @@ public final class Product {
         this.warrantyMonths = warrantyMonths;
         WarrantyStock.checkStock(stock);
         this.stock = stock;
+        checkKind(kind, this.category);
+    }
+
+    /**
+     * Blocks finalizer attacks on a partially constructed product; the constructor can throw
+     * (SpotBugs {@code CT_CONSTRUCTOR_THROW}) and the class cannot be final.
+     */
+    @Override
+    @SuppressWarnings({"removal", "deprecation"})
+    protected final void finalize() {
+        // intentionally empty
+    }
+
+    // A static helper keeps the throw out of the constructor body (SpotBugs CT_CONSTRUCTOR_THROW).
+    private static void checkKind(ProductKind kind, String category) {
+        if (!kind.accepts(category)) {
+            throw new ProductValidationException(
+                    RecordField.CATEGORY, ValidationError.CATEGORY_MISMATCH, category);
+        }
+    }
+
+    /**
+     * Creates the subtype that matches the category.
+     *
+     * @throws NullPointerException       if {@code name} or {@code category} is {@code null}
+     * @throws ProductValidationException for the first failing field, in parameter order
+     */
+    public static Product of(String name, String category, double price, int warrantyMonths, int stock) {
+        return ProductKind.fromCategory(category).create(name, category, price, warrantyMonths, stock);
     }
 
     /**
@@ -87,7 +124,7 @@ public final class Product {
         int warrantyMonths = parseInt(
                 RecordField.WARRANTY_MONTHS, fields[RecordField.WARRANTY_MONTHS.index()].strip());
         int stock = parseInt(RecordField.STOCK, fields[RecordField.STOCK.index()].strip());
-        return new Product(name, category, price, warrantyMonths, stock);
+        return of(name, category, price, warrantyMonths, stock);
     }
 
     private static double parsePrice(String raw) {
@@ -185,6 +222,11 @@ public final class Product {
         return BigDecimal.valueOf(price).toPlainString();
     }
 
+    /** Returns the kind of this product. */
+    public final ProductKind kind() {
+        return kind;
+    }
+
     /** Returns the stripped, non-blank name. */
     public String getName() {
         return name;
@@ -229,8 +271,8 @@ public final class Product {
     }
 
     /**
-     * Collects field values and creates a {@link Product} through its validating constructor, so
-     * the builder cannot produce an invalid product. Unset text is {@code null}, unset numbers
+     * Collects field values and creates a {@link Product} through {@link Product#of}, so the
+     * builder cannot produce an invalid product. Unset text is {@code null}, unset numbers
      * are 0.
      */
     public static final class Builder {
@@ -278,10 +320,10 @@ public final class Product {
          * Creates a new product from the current values.
          *
          * @throws NullPointerException       if the name or the category is not set
-         * @throws ProductValidationException as the {@link Product} constructor does
+         * @throws ProductValidationException as {@link Product#of} does
          */
         public Product build() {
-            return new Product(name, category, price, warrantyMonths, stock);
+            return of(name, category, price, warrantyMonths, stock);
         }
     }
 }

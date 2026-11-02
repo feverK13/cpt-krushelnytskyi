@@ -100,21 +100,21 @@ class ProductBuilderTest {
     @Test
     void missingNameFailsLikeANullNameInTheConstructor() {
         assertSameRejection(
-                () -> new Product(null, CATEGORY, 1, 1, 1),
+                () -> Product.of(null, CATEGORY, 1, 1, 1),
                 () -> Product.builder().category(CATEGORY).price(1).warrantyMonths(1).stock(1).build());
     }
 
     @Test
     void missingCategoryFailsLikeANullCategoryInTheConstructor() {
         assertSameRejection(
-                () -> new Product(NAME, null, 1, 1, 1),
+                () -> Product.of(NAME, null, 1, 1, 1),
                 () -> Product.builder().name(NAME).price(1).warrantyMonths(1).stock(1).build());
     }
 
     @Test
     void missingPriceFailsLikeTheDefaultPriceInTheConstructor() {
         assertSameRejection(
-                () -> new Product(NAME, CATEGORY, 0.0, 1, 1),
+                () -> Product.of(NAME, CATEGORY, 0.0, 1, 1),
                 () -> Product.builder().name(NAME).category(CATEGORY).warrantyMonths(1).stock(1).build());
     }
 
@@ -129,9 +129,9 @@ class ProductBuilderTest {
     @Test
     void nullNameAndCategoryFailLikeTheConstructor() {
         assertSameRejection(
-                () -> new Product(null, CATEGORY, 1, 1, 1), () -> valid().name(null).build());
+                () -> Product.of(null, CATEGORY, 1, 1, 1), () -> valid().name(null).build());
         assertSameRejection(
-                () -> new Product(NAME, null, 1, 1, 1), () -> valid().category(null).build());
+                () -> Product.of(NAME, null, 1, 1, 1), () -> valid().category(null).build());
         assertThrows(NullPointerException.class, () -> valid().name(null).build());
         assertThrows(NullPointerException.class, () -> valid().category(null).build());
     }
@@ -140,14 +140,14 @@ class ProductBuilderTest {
     @ValueSource(strings = {"", " ", "\t", " \t "})
     void blankNameFailsLikeTheConstructor(String name) {
         assertSameRejection(
-                () -> new Product(name, CATEGORY, 1, 1, 1), () -> valid().name(name).build());
+                () -> Product.of(name, CATEGORY, 1, 1, 1), () -> valid().name(name).build());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"", " ", "\t", " \t "})
     void blankCategoryFailsLikeTheConstructor(String category) {
         assertSameRejection(
-                () -> new Product(NAME, category, 1, 1, 1), () -> valid().category(category).build());
+                () -> Product.of(NAME, category, 1, 1, 1), () -> valid().category(category).build());
     }
 
     @ParameterizedTest
@@ -157,7 +157,7 @@ class ProductBuilderTest {
     })
     void invalidPriceFailsLikeTheConstructor(double price) {
         assertSameRejection(
-                () -> new Product(NAME, CATEGORY, price, 1, 1), () -> valid().price(price).build());
+                () -> Product.of(NAME, CATEGORY, price, 1, 1), () -> valid().price(price).build());
     }
 
     @ParameterizedTest
@@ -170,7 +170,7 @@ class ProductBuilderTest {
     @ValueSource(ints = {-1, -12, Integer.MIN_VALUE})
     void negativeWarrantyFailsLikeTheConstructor(int warranty) {
         assertSameRejection(
-                () -> new Product(NAME, CATEGORY, 1, warranty, 1),
+                () -> Product.of(NAME, CATEGORY, 1, warranty, 1),
                 () -> valid().warrantyMonths(warranty).build());
     }
 
@@ -184,7 +184,7 @@ class ProductBuilderTest {
     @ValueSource(ints = {-1, -3, Integer.MIN_VALUE})
     void negativeStockFailsLikeTheConstructor(int stock) {
         assertSameRejection(
-                () -> new Product(NAME, CATEGORY, 1, 1, stock), () -> valid().stock(stock).build());
+                () -> Product.of(NAME, CATEGORY, 1, 1, stock), () -> valid().stock(stock).build());
     }
 
     @ParameterizedTest
@@ -196,10 +196,10 @@ class ProductBuilderTest {
     @Test
     void firstInvalidFieldWinsLikeInTheConstructor() {
         assertSameRejection(
-                () -> new Product(" ", CATEGORY, 0, -1, -1),
+                () -> Product.of(" ", CATEGORY, 0, -1, -1),
                 () -> valid().name(" ").price(0).warrantyMonths(-1).stock(-1).build());
         assertSameRejection(
-                () -> new Product(NAME, CATEGORY, 0, -1, -1),
+                () -> Product.of(NAME, CATEGORY, 0, -1, -1),
                 () -> valid().price(0).warrantyMonths(-1).stock(-1).build());
     }
 }

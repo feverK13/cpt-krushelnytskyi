@@ -32,7 +32,12 @@ public enum ValidationError {
     NOT_POSITIVE("має бути більше нуля: \"%s\"", "must be greater than zero: \"%s\""),
 
     /** The field is a number that does not fit into the target type. */
-    TOO_LARGE("завелике значення: \"%s\"", "value is too large: \"%s\"");
+    TOO_LARGE("завелике значення: \"%s\"", "value is too large: \"%s\""),
+
+    /** The category does not belong to the kind of the product subtype. */
+    CATEGORY_MISMATCH(
+            "категорія не відповідає типу товару: \"%s\"",
+            "category does not match the product type: \"%s\"");
 
     private final String ukrainianTemplate;
     private final String englishTemplate;
